@@ -1,25 +1,71 @@
 const PLAYER_1 = "player1";
 const PLAYER_2 = "player2";
 
-function attack() {
-    console.log(this.name + "Fight...");
+const characterMap = new Map([
+    [
+        "scorpion",
+        {
+            img: "http://reactmarathon-api.herokuapp.com/assets/scorpion.gif",
+            weapon: ["Kunai", "Axe", "Long Sword", "Ninja Sword", "Mugai Ryu"],
+        },
+    ],
+    [
+        "kitana",
+        {
+            img: "http://reactmarathon-api.herokuapp.com/assets/kitana.gif",
+            weapon: ["Steel Fans", "Flying Blade", "Glaive", "Sais"],
+        },
+    ],
+    [
+        "liukang",
+        {
+            img: "http://reactmarathon-api.herokuapp.com/assets/liukang.gif",
+            weapon: ["Dragon Sword", "Nunchaku", "Houan Chains"],
+        },
+    ],
+    [
+        "sonya",
+        {
+            img: "http://reactmarathon-api.herokuapp.com/assets/sonya.gif",
+            weapon: [
+                "Energy Bracelets",
+                "Wind Blade",
+                "Kali Sticks",
+                "Garrote Wire",
+                "Grenades ",
+                "Drone",
+                "Turret",
+            ],
+        },
+    ],
+    [
+        "subzero",
+        {
+            img: "http://reactmarathon-api.herokuapp.com/assets/subzero.gif",
+            weapon: [
+                "Ice Scepter",
+                "Kori Blade",
+                "Cybernetic Weapons",
+                "Ice Daggers",
+                "Ice Hammer",
+                "Ice Pollaxe",
+            ],
+        },
+    ],
+]);
+
+class Character {
+    constructor(name, hp) {
+        const { img, weapon } = characterMap.get(name);
+        this.name = name.toUpperCase();
+        this.hp = hp;
+        this.img = img;
+        this.weapon = weapon;
+        this.attack = function () {
+            console.log(this.name + "Fight...");
+        };
+    }
 }
-
-const scorpion = {
-    name: "SCORPION",
-    hp: 50,
-    img: "http://reactmarathon-api.herokuapp.com/assets/scorpion.gif",
-    weapon: ["Kunai", "Axe", "Long Sword", "Ninja Sword", "Mugai Ryu"],
-    attack,
-};
-
-const kitana = {
-    name: "KITANA",
-    hp: 80,
-    img: "http://reactmarathon-api.herokuapp.com/assets/kitana.gif",
-    weapon: ["Steel Fans", "Flying Blade", "Glaive", "Sais"],
-    attack,
-};
 
 function createPlayer(playerId, { name, hp, img }) {
     const $player = document.createElement("div");
@@ -52,5 +98,8 @@ function createPlayer(playerId, { name, hp, img }) {
     $arenas.appendChild($player);
 }
 
+const scorpion = new Character("scorpion", 50);
 createPlayer(PLAYER_1, scorpion);
+
+const kitana = new Character("kitana", 80);
 createPlayer(PLAYER_2, kitana);
