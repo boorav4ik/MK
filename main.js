@@ -1,32 +1,49 @@
 const $arenas = document.querySelector(".arenas");
 const $randomButton = document.querySelector(".button");
 
-$randomButton.addEventListener("click", () => {
-    function showWinner(name) {
+function fightIsOver(resultText) {
+    function showResult() {
         $arenas.appendChild(
             createElement({
-                classList: ["winsTitle"],
-                innerText: `${name} wins`,
+                classList: ["resultTitle"],
+                innerText: resultText,
             })
         );
     }
+    showResult(resultText);
+    $randomButton.disabled = true;
+}
 
-    function fightIsOver(winnerName) {
-        showWinner(winnerName);
-        $randomButton.disabled = true;
+$randomButton.addEventListener("click", () => {
+    function dealRandomDamage(player) {
+        function randomDamage() {
+            return Math.ceil(Math.random() * 20);
+        }
+        player.changeHP(randomDamage());
     }
 
-    function randomDamage() {
-        return Math.ceil(Math.random() * 20);
+    function fightReducer(accumulator, { hp }, index) {
+        return accumulator + !hp * 10 ** index;
     }
 
-    if (!player1.changeHP(randomDamage())) {
-        fightIsOver(player2.name);
+    function checkRoundResult(result) {
+        switch (result) {
+            case 11:
+                fightIsOver("round draw");
+                break;
+            case 10:
+                fightIsOver(`${players[0].name} wins`);
+                break;
+            case 1:
+                fightIsOver(`${players[1].name} wins`);
+                break;
+            default:
+                break;
+        }
     }
 
-    if (!player2.changeHP(randomDamage())) {
-        fightIsOver(player1.name);
-    }
+    players.forEach(dealRandomDamage);
+    checkRoundResult(players.reduce(fightReducer, 0));
 });
 
 const characterMap = new Map([
@@ -118,8 +135,7 @@ function createElement({
 }
 
 class Player {
-    constructor(player, name) {
-        const { img, weapon } = characterMap.get(name);
+    constructor(player, name, { img, weapon }) {
         this.player = player;
         this.name = name.toUpperCase();
         this.hp = 100;
@@ -137,7 +153,6 @@ class Player {
                 this.hp -= damage;
             }
             this.$life.style.width = this.hp + "%";
-            return this.hp;
         };
 
         this.createPlayer = function () {
@@ -167,9 +182,18 @@ class Player {
     }
 }
 
-const player1 = new Player(1, "scorpion");
-const player2 = new Player(2, "kitana");
+function appendPlayer(playerId) {
+    function getRandomCharacter(characters) {
+        return [...characters.keys()][
+            Math.floor(Math.random() * characters.size)
+        ];
+    }
+    const character = getRandomCharacter(characterMap);
+    const player = new Player(playerId, character, characterMap.get(character));
 
-[player1, player2].forEach((player) => {
     $arenas.appendChild(player.createPlayer());
-});
+
+    return player;
+}
+
+const players = [1, 2].map(appendPlayer);
