@@ -56,6 +56,41 @@ const characterMap = new Map([
     ],
 ]);
 
+function createElement({
+    tag = "div",
+    classList,
+    styleSheet,
+    innerText,
+    src,
+    children,
+}) {
+    const $element = document.createElement(tag);
+
+    if (Array.isArray(classList) && classList.length > 0) {
+        classList.forEach((className) => $element.classList.add(className));
+    }
+
+    if (styleSheet) {
+        for (const [key, value] of Object.entries(styleSheet)) {
+            $element.style[key] = value;
+        }
+    }
+
+    if (innerText) {
+        $element.innerText = innerText;
+    }
+
+    if (Array.isArray(children)) {
+        children.forEach((child) => $element.appendChild(createElement(child)));
+    }
+
+    if (src) {
+        $element.src = src;
+    }
+
+    return $element;
+}
+
 class Player {
     constructor(name, hp) {
         const { img, weapon } = characterMap.get(name);
@@ -72,28 +107,26 @@ class Player {
             const $player = document.createElement("div");
             $player.classList.add(playerId);
 
-            const $progressbar = document.createElement("div");
-            $progressbar.classList.add("progressbar");
-
-            const $life = document.createElement("div");
-            $life.classList.add("life");
-            $life.style.width = `${this.hp}%`;
-            $progressbar.appendChild($life);
-
-            const $name = document.createElement("div");
-            $name.classList.add("name");
-            $name.innerText = this.name;
-            $progressbar.appendChild($name);
-
-            const $character = document.createElement("div");
-            $character.classList.add("character");
-
-            const $img = document.createElement("img");
-            $img.src = this.img;
-            $character.appendChild($img);
-
-            $player.appendChild($progressbar);
-            $player.appendChild($character);
+        this.createPlayer = function () {
+            const $player = createElement({
+                classList: ["player" + this.player],
+                children: [
+                    {
+                        classList: ["progressbar"],
+                        children: [
+                            {
+                                classList: ["life"],
+                                styleSheet: { width: this.hp + "%" },
+                            },
+                            { classList: ["name"], innerText: this.name },
+                        ],
+                    },
+                    {
+                        classList: ["character"],
+                        children: [{ tag: "img", src: this.img }],
+                    },
+                ],
+            });
 
             return $player;
         };
