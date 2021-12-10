@@ -7,28 +7,28 @@ const characterMap = new Map([
     [
         "scorpion",
         {
-            img: "http://reactmarathon-api.herokuapp.com/assets/scorpion.gif",
+            img: "assets/scorpion.gif",
             weapon: ["Kunai", "Axe", "Long Sword", "Ninja Sword", "Mugai Ryu"],
         },
     ],
     [
         "kitana",
         {
-            img: "http://reactmarathon-api.herokuapp.com/assets/kitana.gif",
+            img: "assets/kitana.gif",
             weapon: ["Steel Fans", "Flying Blade", "Glaive", "Sais"],
         },
     ],
     [
         "liukang",
         {
-            img: "http://reactmarathon-api.herokuapp.com/assets/liukang.gif",
+            img: "assets/liukang.gif",
             weapon: ["Dragon Sword", "Nunchaku", "Houan Chains"],
         },
     ],
     [
         "sonya",
         {
-            img: "http://reactmarathon-api.herokuapp.com/assets/sonya.gif",
+            img: "assets/sonya.gif",
             weapon: [
                 "Energy Bracelets",
                 "Wind Blade",
@@ -43,7 +43,7 @@ const characterMap = new Map([
     [
         "subzero",
         {
-            img: "http://reactmarathon-api.herokuapp.com/assets/subzero.gif",
+            img: "assets/subzero.gif",
             weapon: [
                 "Ice Scepter",
                 "Kori Blade",
