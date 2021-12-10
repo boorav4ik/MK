@@ -92,10 +92,11 @@ function createElement({
 }
 
 class Player {
-    constructor(name, hp) {
+    constructor(player, name) {
         const { img, weapon } = characterMap.get(name);
+        this.player = player;
         this.name = name.toUpperCase();
-        this.hp = hp;
+        this.hp = 100;
         this.img = img;
         this.weapon = weapon;
 
@@ -103,9 +104,15 @@ class Player {
             console.log(this.name + "Fight...");
         };
 
-        this.createPlayer = function (playerId) {
-            const $player = document.createElement("div");
-            $player.classList.add(playerId);
+        this.changeHP = function (damage) {
+            if (damage >= this.hp) {
+                this.hp = 0;
+            } else {
+                this.hp -= damage;
+            }
+            this.$life.style.width = this.hp + "%";
+            return this.hp;
+        };
 
         this.createPlayer = function () {
             const $player = createElement({
@@ -128,6 +135,7 @@ class Player {
                 ],
             });
 
+            this.$life = $player.firstChild.firstChild;
             return $player;
         };
     }
