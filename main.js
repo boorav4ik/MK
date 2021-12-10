@@ -1,7 +1,33 @@
-const PLAYER_1 = "player1";
-const PLAYER_2 = "player2";
-
 const $arenas = document.querySelector(".arenas");
+const $randomButton = document.querySelector(".button");
+
+$randomButton.addEventListener("click", () => {
+    function showWinner(name) {
+        $arenas.appendChild(
+            createElement({
+                classList: ["winsTitle"],
+                innerText: `${name} wins`,
+            })
+        );
+    }
+
+    function fightIsOver(winnerName) {
+        showWinner(winnerName);
+        $randomButton.disabled = true;
+    }
+
+    function randomDamage() {
+        return Math.ceil(Math.random() * 20);
+    }
+
+    if (!player1.changeHP(randomDamage())) {
+        fightIsOver(player2.name);
+    }
+
+    if (!player2.changeHP(randomDamage())) {
+        fightIsOver(player1.name);
+    }
+});
 
 const characterMap = new Map([
     [
@@ -141,9 +167,9 @@ class Player {
     }
 }
 
-const player1 = new Player("scorpion", 50);
-$arenas.appendChild(player1.createPlayer(PLAYER_1));
+const player1 = new Player(1, "scorpion");
+const player2 = new Player(2, "kitana");
 
-const player2 = new Player("kitana", 80);
-$arenas.appendChild(player2.createPlayer(PLAYER_2));
-
+[player1, player2].forEach((player) => {
+    $arenas.appendChild(player.createPlayer());
+});
