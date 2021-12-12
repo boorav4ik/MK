@@ -1,34 +1,73 @@
-const PLAYER_1 = "player1";
-const PLAYER_2 = "player2";
-
 const $arenas = document.querySelector(".arenas");
+const $randomButton = document.querySelector(".button");
+
+function finishRound(resultText) {
+    function showResult() {
+        $arenas.appendChild(
+            createElement({
+                classList: ["resultTitle"],
+                innerText: resultText,
+            })
+        );
+    }
+    showResult(resultText);
+    $randomButton.disabled = true;
+}
+
+$randomButton.addEventListener("click", () => {
+    function dealRandomDamage(player) {
+        function getRandomDamage() {
+            return Math.ceil(Math.random() * 20);
+        }
+        player.changeHP(getRandomDamage());
+    }
+
+    function reduceRoundResult(accumulator, { hp }, index) {
+        return accumulator + !hp * 10 ** index;
+    }
+
+    function checkRoundResult(result) {
+        if (result) {
+            finishRound(
+                {
+                    1: `${players[1].name} wins`,
+                    10: `${players[0].name} wins`,
+                    11: "round draw",
+                }[result]
+            );
+        }
+    }
+
+    players.forEach(dealRandomDamage);
+    checkRoundResult(players.reduce(reduceRoundResult, 0));
+});
 
 const characterMap = new Map([
     [
         "scorpion",
         {
-            img: "http://reactmarathon-api.herokuapp.com/assets/scorpion.gif",
+            img: "assets/scorpion.gif",
             weapon: ["Kunai", "Axe", "Long Sword", "Ninja Sword", "Mugai Ryu"],
         },
     ],
     [
         "kitana",
         {
-            img: "http://reactmarathon-api.herokuapp.com/assets/kitana.gif",
+            img: "assets/kitana.gif",
             weapon: ["Steel Fans", "Flying Blade", "Glaive", "Sais"],
         },
     ],
     [
         "liukang",
         {
-            img: "http://reactmarathon-api.herokuapp.com/assets/liukang.gif",
+            img: "assets/liukang.gif",
             weapon: ["Dragon Sword", "Nunchaku", "Houan Chains"],
         },
     ],
     [
         "sonya",
         {
-            img: "http://reactmarathon-api.herokuapp.com/assets/sonya.gif",
+            img: "assets/sonya.gif",
             weapon: [
                 "Energy Bracelets",
                 "Wind Blade",
@@ -43,7 +82,7 @@ const characterMap = new Map([
     [
         "subzero",
         {
-            img: "http://reactmarathon-api.herokuapp.com/assets/subzero.gif",
+            img: "assets/subzero.gif",
             weapon: [
                 "Ice Scepter",
                 "Kori Blade",
@@ -56,11 +95,46 @@ const characterMap = new Map([
     ],
 ]);
 
+function createElement({
+    tag = "div",
+    classList,
+    styleSheet,
+    innerText,
+    src,
+    children,
+}) {
+    const $element = document.createElement(tag);
+
+    if (Array.isArray(classList) && classList.length > 0) {
+        classList.forEach((className) => $element.classList.add(className));
+    }
+
+    if (styleSheet) {
+        for (const [key, value] of Object.entries(styleSheet)) {
+            $element.style[key] = value;
+        }
+    }
+
+    if (innerText) {
+        $element.innerText = innerText;
+    }
+
+    if (Array.isArray(children)) {
+        children.forEach((child) => $element.appendChild(createElement(child)));
+    }
+
+    if (src) {
+        $element.src = src;
+    }
+
+    return $element;
+}
+
 class Player {
-    constructor(name, hp) {
-        const { img, weapon } = characterMap.get(name);
+    constructor(player, { name, img, weapon }) {
+        this.player = player;
         this.name = name.toUpperCase();
-        this.hp = hp;
+        this.hp = 100;
         this.img = img;
         this.weapon = weapon;
 
@@ -68,41 +142,47 @@ class Player {
             console.log(this.name + "Fight...");
         };
 
-        this.createPlayer = function (playerId) {
-            const $player = document.createElement("div");
-            $player.classList.add(playerId);
+        this.changeHP = function (damage) {
+            this.hp = damage >= this.hp ? 0 : this.hp - damage;
+            this.$life.style.width = this.hp + "%";
+        };
 
-            const $progressbar = document.createElement("div");
-            $progressbar.classList.add("progressbar");
+        this.createPlayer = function () {
+            const $player = createElement({
+                classList: ["player" + this.player],
+                children: [
+                    {
+                        classList: ["progressbar"],
+                        children: [
+                            {
+                                classList: ["life"],
+                                styleSheet: { width: this.hp + "%" },
+                            },
+                            { classList: ["name"], innerText: this.name },
+                        ],
+                    },
+                    {
+                        classList: ["character"],
+                        children: [{ tag: "img", src: this.img }],
+                    },
+                ],
+            });
 
-            const $life = document.createElement("div");
-            $life.classList.add("life");
-            $life.style.width = `${this.hp}%`;
-            $progressbar.appendChild($life);
-
-            const $name = document.createElement("div");
-            $name.classList.add("name");
-            $name.innerText = this.name;
-            $progressbar.appendChild($name);
-
-            const $character = document.createElement("div");
-            $character.classList.add("character");
-
-            const $img = document.createElement("img");
-            $img.src = this.img;
-            $character.appendChild($img);
-
-            $player.appendChild($progressbar);
-            $player.appendChild($character);
-
+            this.$life = $player.firstChild.firstChild;
             return $player;
         };
     }
 }
 
-const player1 = new Player("scorpion", 50);
-$arenas.appendChild(player1.createPlayer(PLAYER_1));
+function appendPlayer(playerId) {
+    function getRandomItemFromMap(items) {
+        const name = [...items.keys()][Math.floor(Math.random() * items.size)];
+        return { ...items.get(name), name };
+    }
 
-const player2 = new Player("kitana", 80);
-$arenas.appendChild(player2.createPlayer(PLAYER_2));
+    const player = new Player(playerId, getRandomItemFromMap(characterMap));
+    $arenas.appendChild(player.createPlayer());
+    return player;
+}
 
+const players = [1, 2].map(appendPlayer);
