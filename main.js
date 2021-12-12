@@ -14,12 +14,10 @@ function finishRound(resultText) {
     $randomButton.disabled = true;
 }
 
-$randomButton.addEventListener("click", () => {
+$randomButton.addEventListener("click", function () {
     function dealRandomDamage(player) {
-        function getRandomDamage() {
-            return Math.ceil(Math.random() * 20);
-        }
-        player.changeHP(getRandomDamage());
+        const randomDamage = Math.ceil(Math.random() * 20);
+        player.changeHP(randomDamage);
     }
 
     function reduceRoundResult(accumulator, { hp }, index) {
@@ -146,31 +144,33 @@ class Player {
             this.hp = damage >= this.hp ? 0 : this.hp - damage;
             this.$life.style.width = this.hp + "%";
         };
+    }
 
-        this.createPlayer = function () {
-            const $player = createElement({
-                classList: ["player" + this.player],
-                children: [
-                    {
-                        classList: ["progressbar"],
-                        children: [
-                            {
-                                classList: ["life"],
-                                styleSheet: { width: this.hp + "%" },
-                            },
-                            { classList: ["name"], innerText: this.name },
-                        ],
-                    },
-                    {
-                        classList: ["character"],
-                        children: [{ tag: "img", src: this.img }],
-                    },
-                ],
-            });
+    get element() {
+        if (this.$playerElement) return this.$playerElement;
+        const $player = createElement({
+            classList: ["player" + this.player],
+            children: [
+                {
+                    classList: ["progressbar"],
+                    children: [
+                        {
+                            classList: ["life"],
+                            styleSheet: { width: this.hp + "%" },
+                        },
+                        { classList: ["name"], innerText: this.name },
+                    ],
+                },
+                {
+                    classList: ["character"],
+                    children: [{ tag: "img", src: this.img }],
+                },
+            ],
+        });
 
-            this.$life = $player.firstChild.firstChild;
-            return $player;
-        };
+        this.$life = $player.firstChild.firstChild;
+        this.$playerElement = $player
+        return $player;
     }
 }
 
@@ -181,7 +181,7 @@ function appendPlayer(playerId) {
     }
 
     const player = new Player(playerId, getRandomItemFromMap(characterMap));
-    $arenas.appendChild(player.createPlayer());
+    $arenas.appendChild(player.element);
     return player;
 }
 
