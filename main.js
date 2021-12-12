@@ -1,7 +1,7 @@
 const $arenas = document.querySelector(".arenas");
 const $randomButton = document.querySelector(".button");
 
-function fightIsOver(resultText) {
+function finishRound(resultText) {
     function showResult() {
         $arenas.appendChild(
             createElement({
@@ -16,34 +16,30 @@ function fightIsOver(resultText) {
 
 $randomButton.addEventListener("click", () => {
     function dealRandomDamage(player) {
-        function randomDamage() {
+        function getRandomDamage() {
             return Math.ceil(Math.random() * 20);
         }
-        player.changeHP(randomDamage());
+        player.changeHP(getRandomDamage());
     }
 
-    function fightReducer(accumulator, { hp }, index) {
+    function reduceRoundResult(accumulator, { hp }, index) {
         return accumulator + !hp * 10 ** index;
     }
 
     function checkRoundResult(result) {
-        switch (result) {
-            case 11:
-                fightIsOver("round draw");
-                break;
-            case 10:
-                fightIsOver(`${players[0].name} wins`);
-                break;
-            case 1:
-                fightIsOver(`${players[1].name} wins`);
-                break;
-            default:
-                break;
+        if (result) {
+            finishRound(
+                {
+                    1: `${players[1].name} wins`,
+                    10: `${players[0].name} wins`,
+                    11: "round draw",
+                }[result]
+            );
         }
     }
 
     players.forEach(dealRandomDamage);
-    checkRoundResult(players.reduce(fightReducer, 0));
+    checkRoundResult(players.reduce(reduceRoundResult, 0));
 });
 
 const characterMap = new Map([
@@ -135,7 +131,7 @@ function createElement({
 }
 
 class Player {
-    constructor(player, name, { img, weapon }) {
+    constructor(player, { name, img, weapon }) {
         this.player = player;
         this.name = name.toUpperCase();
         this.hp = 100;
@@ -147,11 +143,7 @@ class Player {
         };
 
         this.changeHP = function (damage) {
-            if (damage >= this.hp) {
-                this.hp = 0;
-            } else {
-                this.hp -= damage;
-            }
+            this.hp = damage >= this.hp ? 0 : this.hp - damage;
             this.$life.style.width = this.hp + "%";
         };
 
@@ -183,16 +175,13 @@ class Player {
 }
 
 function appendPlayer(playerId) {
-    function getRandomCharacter(characters) {
-        return [...characters.keys()][
-            Math.floor(Math.random() * characters.size)
-        ];
+    function getRandomItemFromMap(items) {
+        const name = [...items.keys()][Math.floor(Math.random() * items.size)];
+        return { ...items.get(name), name };
     }
-    const character = getRandomCharacter(characterMap);
-    const player = new Player(playerId, character, characterMap.get(character));
 
+    const player = new Player(playerId, getRandomItemFromMap(characterMap));
     $arenas.appendChild(player.createPlayer());
-
     return player;
 }
 
